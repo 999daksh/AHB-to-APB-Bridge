@@ -151,6 +151,7 @@ The overall system is divided into an AHB interface, bridge control logic, and A
 
 # 📂 Repository Structure
 
+```
 AHB-to-APB-Bridge/
 │
 ├── rtl/
@@ -314,16 +315,20 @@ Sequence → Sequencer → Driver → DUT
 
 ### UVM Components
 
-- `ahb_transaction` — AHB transaction object
-- `ahb_sequence` — Generates constrained-random transactions
-- `ahb_sequencer` — Sends transactions to the driver
-- `ahb_driver` — Converts transactions into AHB pin-level activity
-- `ahb_monitor` — Observes AHB transfers
-- `apb_monitor` — Observes APB transfers
-- `apb_slave_model` — Models APB slave responses
-- `bridge_scoreboard` — Compares AHB and APB transactions
-- `ahb_agent` — Contains AHB sequencer, driver, and monitor
-- `bridge_env` — Integrates the verification components
+- `ahb_if.sv` — AHB interface, connects the testbench to the DUT's AHB signals
+- `apb_if.sv` — APB interface, connects the testbench to the DUT's APB signals
+- `ahb_sequence_item.sv` — AHB transaction object
+- `apb_sequence_item.sv` — APB transaction object
+- `ahb_sequence.sv` — Generates constrained-random AHB transactions
+- `ahb_sequencer.sv` — Sends transactions to the AHB driver
+- `ahb_driver.sv` — Converts transactions into AHB pin-level activity
+- `ahb_monitor.sv` — Observes AHB transfers
+- `apb_monitor.sv` — Observes APB transfers
+- `apb_slave_model.sv` — Models APB slave responses
+- `bridge_scoreboard.sv` — Compares AHB and APB transactions
+- `ahb_agent.sv` — Contains the AHB sequencer, driver, and monitor
+- `env.sv` — Integrates the verification components
+- `test.sv` — Top-level UVM test that configures and runs the environment
 
 ### Verification Strategy
 
