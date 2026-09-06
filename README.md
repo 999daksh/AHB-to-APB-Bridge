@@ -1,6 +1,6 @@
-## 🌉 AHB-to-APB Bridge
+# 🌉 AHB-to-APB Bridge
 
-![Language](https://img.shields.io/badge/Language-Verilog-blue)
+![Verilog](https://img.shields.io/badge/Language-Verilog-blue)
 ![Protocol](https://img.shields.io/badge/AMBA-AHB%20%2F%20APB-orange)
 ![Verification](https://img.shields.io/badge/Verification-UVM-red)
 ![Methodology](https://img.shields.io/badge/Methodology-SystemVerilog-purple)
@@ -12,82 +12,7 @@ The design was verified using a **SystemVerilog/UVM** testbench with constrained
 
 ---
 
-## Table of Contents
-- [Project Overview](#project-overview)
-- [Features](#features)
-- [AMBA Protocols](#amba-protocols)
-- [System Architecture](#system-architecture)
-- [RTL Architecture](#rtl-architecture)
-- [RTL Modules](#rtl-modules)
-- [Bridge FSM](#bridge-fsm)
-- [Data Flow](#data-flow)
-- [Verification Environment](#verification-environment)
-- [UVM Components](#uvm-components)
-- [Verification Strategy](#verification-strategy)
-- [Verification Results](#verification-results)
-- [Simulation](#simulation)
-- [Synthesis](#synthesis)
-- [Project Directory](#project-directory)
-- [Tools and Technologies](#tools-and-technologies)
-- [Current Scope](#current-scope)
-- [Future Enhancements](#future-enhancements)
-- [Key Learning Outcomes](#key-learning-outcomes)
-- [Author](#author)
-
----
-
-## Project Overview
-
-The **AHB-to-APB Bridge** provides protocol conversion between an AMBA **AHB master** and an APB peripheral.
-
-AHB is intended for higher-performance system communication, while APB is designed for simpler, low-bandwidth peripherals such as:
-
-- UART
-- GPIO
-- Timers
-- Control/status registers
-- Other peripheral interfaces
-
-The bridge accepts an AHB transaction, captures the required transaction information, converts it into an APB transfer, waits for the APB peripheral to complete the transfer, and returns APB read data to the AHB side.
-
-### Basic Transaction Flow
-
-```text
-                 AHB Master
-                     |
-                     v
-             +----------------+
-             |  AHB Slave IF  |
-             +--------+-------+
-                      |
-              Captured AHB Data
-                      |
-                      v
-             +----------------+
-             |   Bridge FSM   |
-             +--------+-------+
-                      |
-                APB Control
-                      |
-                      v
-             +----------------+
-             |  APB Master IF |
-             +--------+-------+
-                      |
-                      v
-                 APB Slave
-                      |
-                 PRDATA/PREADY
-                      |
-                      v
-                   AHB Side
-```
-
----
-
 ## ✨ Features
-
-### RTL Features
 
 - 32-bit AHB-to-APB bridge
 - Single AHB transaction support
@@ -96,27 +21,19 @@ The bridge accepts an AHB transaction, captures the required transaction informa
 - APB Setup phase generation
 - APB Enable phase generation
 - APB wait-state handling through `PREADY`
-- AHB address capture
-- AHB write-data capture
-- AHB read/write control capture
-- APB address generation
-- APB write-data generation
-- APB read-data forwarding
+- AHB address, write-data, and read/write control capture
+- APB address, write-data generation, and read-data forwarding
 - Modular hierarchical RTL architecture
 - Synthesizable Verilog HDL
-
-### Verification Features
-
 - SystemVerilog/UVM-based testbench
 - Constrained-random AHB stimulus generation
 - Transaction-level AHB and APB monitoring
 - Scoreboard-based automatic checking
 - APB slave behavioral model
-- Directed read and write transaction tests
 
 ---
 
-## 📡 AMBA Protocols
+# 📡 AMBA Protocols
 
 ### AHB
 
@@ -140,7 +57,7 @@ Important AHB signals used by the design include:
 
 `HTRANS` encoding:
 
-```text
+```
 00 -> IDLE
 01 -> BUSY
 10 -> NONSEQ
@@ -169,7 +86,7 @@ Important APB signals include:
 
 An APB transfer consists of two phases:
 
-```text
+```
 Setup Phase
     |
     | PSEL = 1
@@ -189,11 +106,11 @@ The bridge remains in the Enable phase until the APB peripheral asserts `PREADY 
 
 ---
 
-## 🏗️ System Architecture
+# 🏗️ System Architecture
 
 The overall system is divided into an AHB interface, bridge control logic, and APB interface.
 
-```text
+```
                            AHB Master
                                |
                                |
@@ -232,100 +149,70 @@ The overall system is divided into an AHB interface, bridge control logic, and A
 
 ---
 
-## 🧩 RTL Architecture
+# 📂 Repository Structure
 
-The RTL is divided into four main files.
-
-```text
-bridge_top
-│
-├── ahb_slave_if
-│
-├── bridge_fsm
-│
-└── apb_master_if
 ```
-
-The design follows a clear separation between:
-
-### Control Path
-
-`bridge_fsm` is responsible for:
-
-- `PSEL`
-- `PENABLE`
-- `HREADYOUT`
-- APB transfer sequencing
-
-### Datapath
-
-```text
-ahb_slave_if
-        |
-        v
-addr_reg
-data_reg
-write_reg
-        |
-        v
-apb_master_if
+AHB-to-APB-Bridge/
+│
+├── rtl/
+│   ├── ahb_slave_if.v
+│   ├── bridge_fsm.v
+│   ├── apb_master_if.v
+│   └── bridge_top.v
+│
+├── tb/
+│   └── bridge_tb.v
+│
+├── uvm/
+│   ├── ahb_sequence_item.sv
+│   ├── ahb_sequence.sv
+│   ├── ahb_sequencer.sv
+│   ├── ahb_driver.sv
+│   ├── ahb_monitor.sv
+│   ├── apb_slave_model.sv
+│   ├── scoreboard.sv
+│   ├── env.sv
+│   └── test.sv
+│
+├── images/
+│   ├── block_diagram.png
+│   ├── fsm_diagram.png
+│   └── simulation_waveform.png
+│
+├── sim/
+│   └── ...
+│
+├── README.md
+├── LICENSE
+└── .gitignore
 ```
-
-Responsible for:
-
-- Address
-- Write data
-- Read/write control
-- APB bus connections
 
 ---
 
-## 📦 RTL Modules
+# ⚙️ RTL Modules
 
-### 1. `ahb_slave_if.v`
+### 1. `ahb_slave_if.v` — AHB Slave Interface
 
-The AHB Slave Interface receives transactions from the AHB master and captures the required information for the APB transfer.
+Receives transactions from the AHB master and captures the required information for the APB transfer.
 
-**Responsibilities**
-- Detect valid AHB transactions
-- Capture `HADDR`
-- Capture `HWDATA`
-- Capture `HWRITE`
-- Capture `HSIZE`
-- Generate `trans_valid`
+- Detects valid AHB transactions
+- Captures `HADDR`, `HWDATA`, `HWRITE`, `HSIZE`
+- Generates `trans_valid`
+- Internal registers: `addr_reg`, `data_reg`, `write_reg`, `size_reg`, `trans_valid`
 
-**Internal Registers**
-- `addr_reg`
-- `data_reg`
-- `write_reg`
-- `size_reg`
-- `trans_valid`
+### 2. `bridge_fsm.v` — Bridge Control FSM
 
-The captured information is then provided to the bridge control logic and APB interface.
+Controls the AHB-to-APB transfer sequencing.
 
-### 2. `bridge_fsm.v`
+- States: `IDLE`, `SETUP`, `ENABLE`
+- Generates `PSEL`, `PENABLE`, `HREADYOUT`
+- Waits for `PREADY` and controls APB timing
 
-The Bridge FSM controls the AHB-to-APB transfer sequencing.
+### 3. `apb_master_if.v` — APB Master Interface
 
-**FSM States**
-- `IDLE`
-- `SETUP`
-- `ENABLE`
+Drives the APB bus using the information captured from the AHB side.
 
-**Responsibilities**
-- Generate `PSEL`
-- Generate `PENABLE`
-- Generate `HREADYOUT`
-- Wait for `PREADY`
-- Control APB timing
-
-### 3. `apb_master_if.v`
-
-The APB Master Interface drives the APB bus using the information captured from the AHB side.
-
-**Responsibilities**
-
-```text
+```
 addr_reg   -> PADDR
 data_reg   -> PWDATA
 write_reg  -> PWRITE
@@ -333,31 +220,27 @@ write_reg  -> PWRITE
 
 The APB control signals generated by the FSM are also forwarded to the APB interface.
 
-### 4. `bridge_top.v`
+### 4. `bridge_top.v` — Top-Level Integration
 
-The top-level module integrates all bridge components.
+Integrates all bridge components and provides the APB read-data return path:
 
-```text
+```
 bridge_top
 │
 ├── ahb_slave_if
 ├── bridge_fsm
 └── apb_master_if
-```
 
-It also provides the APB read-data return path:
-
-```text
 PRDATA -> HRDATA
 ```
 
 ---
 
-## 🔄 Bridge FSM
+# 🔄 Bridge FSM
 
 The bridge uses a three-state finite state machine.
 
-```text
+```
                       +------+
                       | IDLE |
                       +--+---+
@@ -384,131 +267,48 @@ The bridge uses a three-state finite state machine.
                                IDLE
 ```
 
-### State Description
-
-**IDLE**
-```text
-PSEL      = 0
-PENABLE   = 0
-HREADYOUT = 1
-```
-The bridge waits for a valid AHB transaction.
-
-**SETUP**
-```text
-PSEL      = 1
-PENABLE   = 0
-```
-The APB transfer is initiated during this phase.
-
-**ENABLE**
-```text
-PSEL      = 1
-PENABLE   = 1
-```
-The APB transfer is active. If `PREADY = 0`, the bridge remains in `ENABLE`. When `PREADY = 1`, the APB transfer completes and the FSM returns to `IDLE`.
+| State | PSEL | PENABLE | HREADYOUT | Description |
+|---|---|---|---|---|
+| IDLE | 0 | 0 | 1 | Waits for a valid AHB transaction |
+| SETUP | 1 | 0 | – | Initiates the APB transfer |
+| ENABLE | 1 | 1 | – | Transfer active; holds until `PREADY = 1` |
 
 ---
 
-## 🔁 Data Flow
+# 🔁 Data Flow
 
 ### Write Transaction
 
-```text
-AHB Master
-    |
-    | HADDR
-    | HWDATA
-    | HWRITE = 1
-    |
-    v
-AHB Slave Interface
-    |
-    v
-addr_reg
-data_reg
-write_reg
-    |
-    v
-APB Master Interface
-    |
-    | PADDR
-    | PWDATA
-    | PWRITE = 1
-    |
-    v
-APB Peripheral
+```
+AHB Master → HADDR, HWDATA, HWRITE=1 → AHB Slave Interface
+    → addr_reg, data_reg, write_reg → APB Master Interface
+    → PADDR, PWDATA, PWRITE=1 → APB Peripheral
 ```
 
 ### Read Transaction
 
-```text
-AHB Master
-    |
-    | HADDR
-    | HWRITE = 0
-    |
-    v
-AHB Slave Interface
-    |
-    v
-APB Master Interface
-    |
-    | PADDR
-    | PWRITE = 0
-    |
-    v
-APB Peripheral
-    |
-    | PRDATA
-    |
-    v
-HRDATA
-    |
-    v
-AHB Master
+```
+AHB Master → HADDR, HWRITE=0 → AHB Slave Interface
+    → APB Master Interface → PADDR, PWRITE=0 → APB Peripheral
+    → PRDATA → HRDATA → AHB Master
 ```
 
 ---
 
-## 🧪 Verification Environment
+# 🧪 Verification Environment
 
-The project includes a SystemVerilog/UVM-based verification environment to verify the bridge functionality at the transaction level.
+The project includes a SystemVerilog/UVM-based verification environment to verify the bridge functionality at the transaction level. The UVM environment is organized around the AHB interface, while an APB slave model provides peripheral-side behavior.
 
-The UVM environment is organized around the AHB interface while an APB slave model provides peripheral-side behavior.
-
-```text
-              +-------------+
-              |   Sequence  |
-              +-------------+
-                     |
-                     v
-              +-------------+
-              |  Sequencer  |
-              +-------------+
-                     |
-                     v
-              +-------------+
-              |   Driver    |
-              +-------------+
-                     |
-                     v
-                    DUT
-                 /       \
-                /         \
-               v           v
-        AHB Monitor    APB Monitor
-               \           /
-                \         /
-                 v       v
-              +-------------+
-              | Scoreboard  |
-              +-------------+
+```
+Sequence → Sequencer → Driver → DUT
+                                 │
+                       ┌─────────┴─────────┐
+                  AHB Monitor          APB Monitor
+                       └─────────┬─────────┘
+                             Scoreboard
 ```
 
----
-
-## 🧱 UVM Components
+### UVM Components
 
 - `ahb_transaction` — AHB transaction object
 - `ahb_sequence` — Generates constrained-random transactions
@@ -521,36 +321,43 @@ The UVM environment is organized around the AHB interface while an APB slave mod
 - `ahb_agent` — Contains AHB sequencer, driver, and monitor
 - `bridge_env` — Integrates the verification components
 
----
+### Verification Strategy
 
-## 🎯 Verification Strategy
-
-The testbench generates AHB read/write transactions and verifies the corresponding APB activity.
-
-The scoreboard checks:
+The testbench generates AHB read/write transactions and verifies the corresponding APB activity. The scoreboard checks:
 
 - AHB address vs APB address
 - AHB read/write control vs APB read/write control
 - AHB write data vs APB write data
 - APB read data vs AHB read data
 
-## Verification Results
+---
 
-The completed test verified:
+# 📊 Verification Results
 
-- 4 write transactions
-- 1 read transaction
-- 0 UVM errors
-- 0 UVM fatal errors
-- Successful end-to-end scoreboard matching
+| Metric | Value |
+|---|---:|
+| Write transactions | 4 |
+| Read transactions | 1 |
+| UVM errors | 0 |
+| UVM fatal errors | 0 |
+| Scoreboard result | ✅ Match |
 
 ---
 
-## ▶️ Simulation
+# 🛠️ Tools Used
 
-The testbench and UVM environment can be run with any standard SystemVerilog/UVM-capable simulator (e.g., QuestaSim, VCS, or Xcelium).
+| Tool | Purpose |
+|---|---|
+| Verilog HDL | RTL design |
+| SystemVerilog / UVM | Functional verification |
+| Simulator (QuestaSim / VCS / Xcelium) | Simulation & waveform generation |
+| Waveform Viewer / GTKWave | Waveform debugging |
+| Yosys / Design Compiler / Genus | Logic synthesis |
+| Git & GitHub | Version control |
 
-Typical simulation flow:
+---
+
+# ▶️ Simulation
 
 ```bash
 # Compile RTL and UVM sources
@@ -560,15 +367,9 @@ vlog rtl/*.v uvm/*.sv tb/bridge_tb.v
 vsim -c work.bridge_tb +UVM_TESTNAME=bridge_test -do "run -all"
 ```
 
-Waveforms can be dumped and viewed in a waveform viewer (e.g., QuestaSim's built-in waveform window or GTKWave) to inspect AHB and APB signal timing.
-
 > Adjust the exact compile/run commands to match the simulator available in your environment.
 
-## ⚙️ Synthesis
-
-The RTL modules are written as synthesizable Verilog HDL and can be synthesized with standard synthesis tools (e.g., Yosys for open-source flows, or Design Compiler/Genus for commercial flows).
-
-Typical synthesis flow:
+# ⚙️ Synthesis
 
 ```bash
 # Example using Yosys
@@ -579,57 +380,29 @@ yosys -p "read_verilog rtl/*.v; synth -top bridge_top; write_verilog synth/bridg
 
 ---
 
-## 📁 Project Directory
+# 📸 Results
 
-```text
-AHB-to-APB-Bridge/
-│
-├── rtl/
-│   ├── ahb_slave_if.v
-│   ├── bridge_fsm.v
-│   ├── apb_master_if.v
-│   └── bridge_top.v
-│
-├── tb/
-│   └── bridge_tb.v
-│
-├── uvm/
-│   ├── ahb_sequence_item.sv
-│   ├── ahb_sequence.sv
-│   ├── ahb_sequencer.sv
-│   ├── ahb_driver.sv
-│   ├── ahb_monitor.sv
-│   ├── apb_slave_model.sv
-│   ├── scoreboard.sv
-│   ├── env.sv
-│   └── test.sv
-│
-├── docs/
-│   ├── block_diagram.png
-│   ├── fsm.png
-│   └── simulation_waveform.png
-│
-├── sim/
-│   └── ...
-│
-└── README.md
-```
+## Block Diagram
+
+![Block Diagram](images/block_diagram.png)
 
 ---
 
-## 🛠️ Tools and Technologies
+## FSM Diagram
 
-- **Design language:** Verilog HDL
-- **Verification language/methodology:** SystemVerilog, UVM
-- **Simulation:** Any UVM-capable simulator (QuestaSim / VCS / Xcelium)
-- **Waveform analysis:** Simulator waveform viewer / GTKWave
-- **Synthesis:** Standard RTL synthesis tools (e.g., Yosys, Design Compiler, Genus)
+![FSM Diagram](images/fsm_diagram.png)
 
 ---
 
-## 📋 Current Scope
+## Simulation Waveform
 
-The current implementation focuses on a basic 32-bit single-transfer AHB-to-APB bridge.
+![Simulation Waveform](images/simulation_waveform.png)
+
+> Place your actual screenshots in the `images/` folder using these filenames (or update the paths above to match whatever you name them).
+
+---
+
+# 📋 Current Scope
 
 ### Supported
 
@@ -653,7 +426,7 @@ The current implementation focuses on a basic 32-bit single-transfer AHB-to-APB 
 
 ---
 
-## 🚀 Future Enhancements
+# 🚀 Future Enhancements
 
 - Add support for AHB burst transfers
 - Implement multiple APB slave address decoding
@@ -664,19 +437,34 @@ The current implementation focuses on a basic 32-bit single-transfer AHB-to-APB 
 
 ---
 
-## 🎓 Key Learning Outcomes
+# 📂 Repository
 
-- Understanding of AMBA AHB and APB protocol signaling and timing
-- FSM-based design for protocol bridging
-- Modular, hierarchical RTL design practices
-- Building a SystemVerilog/UVM verification environment from scratch
-- Constrained-random stimulus generation and transaction-level modeling
-- Scoreboard-based functional checking between two different bus protocols
-- Waveform-based debugging and RTL synthesis flow
+**GitHub Repository:**
+
+https://github.com/999daksh/AHB-to-APB-Bridge
 
 ---
 
-## 👤 Author
+# 📚 References
+
+- ARM AMBA AHB Protocol Specification
+- ARM AMBA APB Protocol Specification
+- IEEE 1800 SystemVerilog / UVM 1.2 User Guide
+
+---
+
+# 👨‍💻 Author
 
 **Daksh Maheshwari**
-B.Tech, Electronics and Communication Engineering, Birla Institute of Technology, Mesra
+
+B.Tech in Electronics & Communication Engineering
+Birla Institute of Technology, Mesra
+
+- GitHub: https://github.com/999daksh/AHB-to-APB-Bridge
+- LinkedIn: https://www.linkedin.com/in/daksh-maheshwari-48612328a/
+
+---
+
+## ⭐ Support
+
+If you found this project useful, consider giving it a **⭐ Star** on GitHub.
