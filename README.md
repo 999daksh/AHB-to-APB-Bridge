@@ -151,7 +151,6 @@ The overall system is divided into an AHB interface, bridge control logic, and A
 
 # 📂 Repository Structure
 
-```
 AHB-to-APB-Bridge/
 │
 ├── rtl/
@@ -164,13 +163,18 @@ AHB-to-APB-Bridge/
 │   └── bridge_tb.v
 │
 ├── uvm/
-│   ├── ahb_sequence_item.sv
-│   ├── ahb_sequence.sv
-│   ├── ahb_sequencer.sv
+│   ├── ahb_agent.sv
 │   ├── ahb_driver.sv
+│   ├── ahb_if.sv
 │   ├── ahb_monitor.sv
+│   ├── ahb_sequence.sv
+│   ├── ahb_sequence_item.sv
+│   ├── ahb_sequencer.sv
+│   ├── apb_if.sv
+│   ├── apb_monitor.sv
+│   ├── apb_sequence_item.sv
 │   ├── apb_slave_model.sv
-│   ├── scoreboard.sv
+│   ├── bridge_scoreboard.sv
 │   ├── env.sv
 │   └── test.sv
 │
